@@ -1,7 +1,7 @@
-// Firebase SDK imports
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getAnalytics, Analytics } from 'firebase/analytics';
 import { getPerformance } from 'firebase/performance';
+import { getFirestore, Firestore } from 'firebase/firestore'; // 🔥 이 줄만 추가
 
 // Firebase 설정 인터페이스
 interface FirebaseConfig {
@@ -35,6 +35,7 @@ const validateConfig = (config: FirebaseConfig): boolean => {
 let app: FirebaseApp | null = null;
 let analytics: Analytics | null = null;
 let performance: ReturnType<typeof getPerformance> | null = null;
+let db: Firestore | null = null; // 🔥 이 줄만 추가
 
 try {
   if (!validateConfig(firebaseConfig)) {
@@ -43,11 +44,14 @@ try {
   
   app = initializeApp(firebaseConfig);
   
+  // 🔥 이 줄만 추가
+  db = getFirestore(app);
+  
   // Analytics 초기화 (브라우저 환경에서만)
   if (typeof window !== 'undefined') {
     analytics = getAnalytics(app);
     performance = getPerformance(app);
-    console.log('✅ Firebase Analytics & Performance 초기화 완료');
+    console.log('✅ Firebase Analytics, Performance & Firestore 초기화 완료'); // 🔥 메시지만 수정
   }
   
 } catch (error) {
@@ -55,11 +59,11 @@ try {
 }
 
 // Firebase 인스턴스들 내보내기
-export { app, analytics, performance };
+export { app, analytics, performance, db }; // 🔥 db만 추가
 
 // 설정 유효성 검사 함수 내보내기
 export const isFirebaseConfigured = (): boolean => {
-  return !!(app && analytics);
+  return !!(app && analytics && db); // 🔥 && db만 추가
 };
 
 // 개발 환경에서 Firebase 설정 상태 로깅
@@ -68,6 +72,7 @@ if (import.meta.env.DEV) {
     app: !!app,
     analytics: !!analytics,
     performance: !!performance,
+    firestore: !!db, // 🔥 이 줄만 추가
     projectId: firebaseConfig.projectId || '설정되지 않음'
   });
 }

@@ -81,6 +81,30 @@ export interface PagePerformanceEvent {
   timestamp: number;
 }
 
+// 🔥 공유 관련 이벤트 추가
+export interface SharedResultViewedEvent {
+  shareId: string;
+  viewerUuid: string;
+  originalCreatorUuid?: string;
+  choiceCount?: number;
+  action?: string;
+  timestamp: number;
+}
+
+export interface ShareUrlGeneratedEvent {
+  uuid: string;
+  shareId: string;
+  success: boolean;
+  error?: string;
+  timestamp: number;
+}
+
+export interface PlayFromSharedEvent {
+  referrerShareId: string;
+  newPlayerUuid: string;
+  timestamp: number;
+}
+
 // 모든 게임 이벤트 타입 통합
 export type GameEventType = 
   | 'game_start'
@@ -91,7 +115,10 @@ export type GameEventType =
   | 'replay_game'
   | 'exit_mid_game'
   | 'card_flip'
-  | 'page_performance';
+  | 'page_performance'
+  | 'shared_result_viewed'
+  | 'share_url_generated'
+  | 'play_from_shared';
 
 // 이벤트 매개변수 타입 매핑
 export interface GameEventParameters {
@@ -104,6 +131,9 @@ export interface GameEventParameters {
   exit_mid_game: ExitMidGameEvent;
   card_flip: CardFlipEvent;
   page_performance: PagePerformanceEvent;
+  shared_result_viewed: SharedResultViewedEvent;
+  share_url_generated: ShareUrlGeneratedEvent;
+  play_from_shared: PlayFromSharedEvent;
 }
 
 // Firebase Analytics 커스텀 이벤트

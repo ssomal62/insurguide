@@ -6,19 +6,24 @@ import { copyToClipboard, getCopyFeedbackMessage } from "@/utils/clipboard";
 import { usePromptGeneration } from "@/hooks/usePromptGeneration";
 import { convertGameChoicesToRoundResults } from "@/utils/convertGameChoice";
 import { partnerChoices } from "@/data/partnerChoices";
+
 import { useFirebase } from "@/hooks/useFirebase";
 import { getOrCreateUUID, resetUUID } from "@/utils/uuid";
-import { responsiveImage, responsiveText } from "@/styles/responsive";
+import { useSharedResult } from "@/hooks/useSharedResult"; // 🔥 추가
 
 import ChoiceListCard from "@/components/result/ChoiceListCard";
 import ScrollPageLayout from "@/components/layout/ScrollPageLayout";
+import { responsiveImage, responsiveText } from "@/styles/responsive";
 
 const ResultPage = () => {
   const navigate = useNavigate();
   const [userChoices, setUserChoices] = useState<GameChoice[]>([]);
   const [isCopied, setIsCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string>(""); // 🔥 추가
+  const [isSharing, setIsSharing] = useState(false); // 🔥 추가
 
   const { generateBasicPrompt } = usePromptGeneration();
+  const { saveAndShareResult } = useSharedResult(); // 🔥 추가
   const {
     logResultViewed,
     logPromptCopied,
@@ -27,7 +32,7 @@ const ResultPage = () => {
     logPagePerformance,
   } = useFirebase();
 
-  const uuid = getOrCreateUUID(); // [🔥 Firebase]
+  const uuid = getOrCreateUUID();
 
   useEffect(() => {
     const loadTime = Math.round(performance.now());
@@ -64,6 +69,24 @@ const ResultPage = () => {
   const roundResults = convertGameChoicesToRoundResults(userChoices);
   const { prompt } = generateBasicPrompt(roundResults);
 
+  // [🔥 Firestore] 공유 URL 생성
+  useEffect(() => {
+    const createShareUrl = async () => {
+      if (userChoices.length === 0 || shareUrl) return;
+
+      try {
+        const result = await saveAndShareResult(userChoices, prompt, uuid);
+        if (result.success && result.shareUrl) {
+          setShareUrl(result.shareUrl);
+        }
+      } catch (error) {
+        console.error('공유 URL 생성 실패:', error);
+      }
+    };
+
+    createShareUrl();
+  }, [userChoices, prompt, uuid, shareUrl]);
+
   // [🔥 Firebase] 프롬프트 복사
   const handleCopy = async () => {
     const result = await copyToClipboard(prompt);
@@ -83,16 +106,21 @@ const ResultPage = () => {
     }
   };
 
-  // [🔥 Firebase] 공유 클릭
+  // [🔥 Firebase] 공유 클릭 - 업데이트
   const handleShare = async () => {
-    const shareUrl = window.location.href;
+    if (!shareUrl) {
+      alert("공유 링크를 생성하는 중입니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
+    setIsSharing(true);
 
     try {
       if (navigator.share) {
         await navigator.share({
           title: "마이리틀 보험팝 결과",
           text: "이거 나랑 비슷한지 해봐!",
-          url: shareUrl,
+          url: shareUrl, // 🔥 변경: Firestore 공유 URL 사용
         });
 
         logShareClicked({
@@ -101,7 +129,7 @@ const ResultPage = () => {
           success: true,
         });
       } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(shareUrl);
+        await navigator.clipboard.writeText(shareUrl); // 🔥 변경
 
         logShareClicked({
           uuid,
@@ -124,6 +152,8 @@ const ResultPage = () => {
         success: false,
       });
       alert("공유에 실패했어요.");
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -216,16 +246,18 @@ const ResultPage = () => {
                     alt="share icon"
                     className="w-[22px] h-[22px]"
                   />
-                  공유하기
+                  {isSharing ? "공유 중..." : "공유하기"}
                 </div>
               }
               onClick={handleShare}
+              disabled={isSharing || !shareUrl} // 🔥 추가: 공유 URL이 없거나 공유 중일 때 비활성화
             />
           </div>
         </div>
       }
     >
       <div className="w-full flex flex-col items-center pt-[71px] text-center font-[Pretendard]">
+        {/* 1. 이미지 */}
         <img
           src="/images/icons/clapping.png"
           alt="trophy"
