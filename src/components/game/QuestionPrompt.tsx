@@ -1,14 +1,16 @@
+import { responsiveText } from "@/styles/responsive";
+
 interface Props {
   text: string;
 }
 
 const QuestionPrompt = ({ text }: Props) => {
   return (
-    <div className="absolute top-[139px] w-[326px] left-1/2 -translate-x-1/2 text-[16px] leading-[22.4px] tracking-[-0.4px] font-normal text-black">
+    <div className={`w-full max-w-[clamp(300px,85vw,650px)] mx-auto ${responsiveText.question}`}>
       {text.split('\n').map((line, idx) => (
         <p
           key={idx}
-          className="whitespace-pre-line text-centerbreak-keep mb-[6px]"
+          className="whitespace-pre-line break-keep mb-[6px]"
           dangerouslySetInnerHTML={{
             __html: line.replace(
               /\*\*(.*?)\*\*/g,

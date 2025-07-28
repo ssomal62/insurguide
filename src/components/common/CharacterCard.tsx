@@ -6,20 +6,22 @@ interface CharacterCardProps {
 
 const CharacterCard = ({ name, imageSrc, info }: CharacterCardProps) => {
   return (
-    <div className="w-[298px] h-[164px] bg-[#007DFF] rounded-[14px] flex items-center relative">
-      {/* 아바타 영역 */}
-      <div className="absolute left-[22px] top-[28px] w-[80px] flex flex-col items-center">
-        <img src={imageSrc} alt="avatar" className="w-[80px] h-[80px]" />
-        <div className="mt-[3px] text-white text-[12px]">{name}</div>
-      </div>
+<div className="w-[clamp(298px,60vw,460px)] h-[clamp(164px,30vw,240px)] bg-white rounded-[14px] shadow-md flex items-center px-[clamp(16px,4vw,28px)] gap-[clamp(16px,3vw,40px)]">
+  <div className="h-[clamp(80px, 22vw, 110px)] w-[clamp(80px,18vw,96px)] flex flex-col justify-center items-center shrink-0">
+    <img
+      src={imageSrc}
+      alt="avatar"
+      className="w-full h-full bg-[#007DFF] rounded-full object-cover"
+    />
+    <div className="mt-[4px] text-basic text-black">{name}</div>
+  </div>
 
-      {/* 프로필 정보 텍스트 (좌측 정렬) */}
-      <div className="ml-[119px] text-white text-[12px] leading-[18px] text-left">
-        {info.map((line, idx) => (
-          <div key={idx}>{line}</div>
-        ))}
-      </div>
-    </div>
+  <div className="text-basic text-black leading-[1.5] text-left space-y-[2px]">
+    {info.map((line, idx) => (
+      <div key={idx}>{line}</div>
+    ))}
+  </div>
+</div>
   );
 };
 

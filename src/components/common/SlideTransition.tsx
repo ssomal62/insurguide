@@ -11,11 +11,12 @@ const SlideTransition = ({ children, keyId }: SlideTransitionProps) => {
     <AnimatePresence mode="wait">
       <motion.div
         key={keyId}
+        className="w-full max-w-container mx-auto relative"
         initial={{ x: 393, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: -393, opacity: 0 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        className="absolute top-0 left-0 w-full h-full"
+
       >
         {children}
       </motion.div>

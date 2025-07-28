@@ -6,15 +6,17 @@ import { copyToClipboard, getCopyFeedbackMessage } from "@/utils/clipboard";
 import { usePromptGeneration } from "@/hooks/usePromptGeneration";
 import { convertGameChoicesToRoundResults } from "@/utils/convertGameChoice";
 import { partnerChoices } from "@/data/partnerChoices";
+import { useFirebase } from "@/hooks/useFirebase";
+import { getOrCreateUUID, resetUUID } from "@/utils/uuid";
+import { responsiveImage, responsiveText } from "@/styles/responsive";
+
 import ChoiceListCard from "@/components/result/ChoiceListCard";
-import { useFirebase } from "@/hooks/useFirebase"; 
-import { getOrCreateUUID, resetUUID } from "@/utils/uuid"; 
-import CopyToast from "@/components/common/CopyToast"; 
+import ScrollPageLayout from "@/components/layout/ScrollPageLayout";
 
 const ResultPage = () => {
   const navigate = useNavigate();
   const [userChoices, setUserChoices] = useState<GameChoice[]>([]);
-  const [showToast, setShowToast] = useState(false); 
+  const [isCopied, setIsCopied] = useState(false);
 
   const { generateBasicPrompt } = usePromptGeneration();
   const {
@@ -23,7 +25,7 @@ const ResultPage = () => {
     logShareClicked,
     logReplayGame,
     logPagePerformance,
-  } = useFirebase(); 
+  } = useFirebase();
 
   const uuid = getOrCreateUUID(); // [🔥 Firebase]
 
@@ -71,7 +73,11 @@ const ResultPage = () => {
         copied: true,
         promptLength: prompt.length,
       });
-      setShowToast(true); 
+
+      setIsCopied(true);
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 1500);
     } else {
       alert(getCopyFeedbackMessage(result));
     }
@@ -134,119 +140,122 @@ const ResultPage = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center pt-[71px] text-center font-[Pretendard]">
-      <img
-        src="/images/icons/trophy.png"
-        alt="trophy"
-        className="w-[133px] h-[183px] mb-4"
-      />
-      <p className="text-[20px] font-medium mb-[12px] leading-[28px]">
-        보험 탐구 여정이 끝났어요!
-      </p>
+    <ScrollPageLayout
+      footer={
+        <div className="w-full">
+          <CommonButton
+            variant="primary"
+            className="w-full result-page"
+            label={
+              <div className="flex items-center justify-center gap-2">
+                <img
+                  src={
+                    isCopied
+                      ? "/images/icons/check-broken.svg"
+                      : "/images/icons/copy_right.png"
+                  }
+                  alt={isCopied ? "check icon" : "copy icon"}
+                  className="w-[20px] h-[20px]"
+                />
+                {isCopied ? "복사완료" : "결과 복사하기"}
+              </div>
+            }
+            onClick={isCopied ? undefined : handleCopy}
+          />
 
-      <p className="text-[14px] font-normal mb-[27px] leading-[19.6px]">
-        이제 결과를 확인할 차례예요!
-        <br />
-        아래 프롬프트를 ChatGPT에 붙여넣으면
-        <br />
-        당신의 보험 성향을 분석해드려요.
-      </p>
-
-      <ChoiceListCard
-        title="내가 선택한 보험"
-        type="user"
-        choices={userChoices}
-      />
-      <ChoiceListCard
-        title="상호의 Pick!"
-        type="partner"
-        choices={partnerChoices}
-      />
-
-      <div className="mt-10 w-full px-4">
-        <CommonButton
-          variant="primary"
-          className="w-full"
-          label={
-            <div className="flex items-center justify-center gap-2">
-              <img
-                src="/images/icons/copy_right.png"
-                alt="copy icon"
-                className="w-[20px] h-[20px]"
+          <div className="mt-2 w-full">
+            <a
+              href="https://chat.openai.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full block"
+            >
+              <CommonButton
+                variant="gpt"
+                style={{ width: "100%" }}
+                icon={null}
+                className="w-full result-page"
+                label={
+                  <span className="flex items-center">
+                    <img
+                      src="/images/icons/gpt.png"
+                      alt="GPT"
+                      className="w-[18px] h-[18px] mr-2"
+                    />
+                    ChatGPT 바로가기
+                  </span>
+                }
               />
-              결과 복사하기
-            </div>
-          }
-          onClick={handleCopy}
-        />
+            </a>
+          </div>
 
-        <div className="mt-2 w-full">
-          <a
-            href="https://chat.openai.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-[358px] block"
-          >
+          <div className="flex justify-between gap-2 mt-2">
             <CommonButton
-              variant="gpt"
-              icon={null}
+              variant="secondary"
+              className="w-full"
               label={
-                <span className="flex items-center">
+                <div className="flex items-center justify-center gap-2 text-[#1989FF]">
                   <img
-                    src="/images/icons/gpt.png"
-                    alt="GPT"
-                    className="w-[18px] h-[18px] mr-2"
+                    src="/images/icons/arrow-rotate.png"
+                    alt="retry icon"
+                    className="w-[19px] h-[19px]"
                   />
-                  ChatGPT 바로가기
-                </span>
+                  다시하기
+                </div>
               }
+              onClick={handleReplay}
             />
-          </a>
+
+            <CommonButton
+              variant="secondary"
+              className="w-full"
+              label={
+                <div className="flex items-center justify-center gap-2 text-[#1989FF]">
+                  <img
+                    src="/images/icons/share.png"
+                    alt="share icon"
+                    className="w-[22px] h-[22px]"
+                  />
+                  공유하기
+                </div>
+              }
+              onClick={handleShare}
+            />
+          </div>
         </div>
-
-        <div className="flex justify-between gap-2 mt-2 mb-[66px]">
-          <CommonButton
-            variant="secondary"
-            className="w-full"
-            label={
-              <div className="flex items-center justify-center gap-2 text-[#1989FF]">
-                <img
-                  src="/images/icons/arrow-rotate.png"
-                  alt="retry icon"
-                  className="w-[19px] h-[19px]"
-                />
-                다시하기
-              </div>
-            }
-            onClick={handleReplay}
-          />
-
-          <CommonButton
-            variant="secondary"
-            className="w-full"
-            label={
-              <div className="flex items-center justify-center gap-2 text-[#1989FF]">
-                <img
-                  src="/images/icons/share.png"
-                  alt="share icon"
-                  className="w-[22px] h-[22px]"
-                />
-                공유하기
-              </div>
-            }
-            onClick={handleShare}
-          />
-        </div>
-      </div>
-
-      {/* ✅ 복사 토스트 하단 고정 */}
-      {showToast && (
-        <CopyToast
-          message="결과가 복사되었습니다."
-          onClose={() => setShowToast(false)}
+      }
+    >
+      <div className="w-full flex flex-col items-center pt-[71px] text-center font-[Pretendard]">
+        <img
+          src="/images/icons/clapping.png"
+          alt="trophy"
+          className={responsiveImage.result}
         />
-      )}
-    </div>
+
+        <div style={{ marginTop: "clamp(16px, 4vw, 32px)" }} />
+        <h1 className={responsiveText.large}>보험 탐구 여정이 끝났어요!</h1>
+        <div style={{ marginTop: "clamp(12px, 3vw, 24px)" }} />
+        <span className={responsiveText.subtext}>
+          이제 결과를 확인할 차례예요!
+          <br />
+          아래 프롬프트를 ChatGPT에 붙여넣으면
+          <br />
+          당신의 보험 성향을 분석해드려요.
+        </span>
+        <div style={{ marginTop: "clamp(40px, 6vw, 80px)" }} />
+        <ChoiceListCard
+          title="내가 선택한 보험"
+          type="user"
+          choices={userChoices}
+        />
+        <div style={{ marginTop: "clamp(16px, 4vw, 40px)" }} />
+        <ChoiceListCard
+          title="상호의 Pick!"
+          type="partner"
+          choices={partnerChoices}
+        />
+      </div>
+    </ScrollPageLayout>
   );
 };
 

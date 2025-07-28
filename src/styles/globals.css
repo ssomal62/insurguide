@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 공통 변수 */
+/* ───────── 공통 변수 정의 ───────── */
 :root {
   --iphone16-height: 852px;
   --color-mist-50: #f0f9ff;
@@ -16,44 +16,63 @@
   --safe-area-bottom: env(safe-area-inset-bottom, 34px);
 }
 
+/* ───────── base 스타일 ───────── */
 @layer base {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
   body {
     margin: 0;
     font-family: var(--font-sans);
-    background-color: #f8f8f8; /* 단색 배경만 지정 */
+    background-color: #f8f8f8; /* App.tsx와 동일한 배경색 */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* #root는 단순하게 - App.tsx에서 레이아웃 관리 */
   #root {
     width: 100%;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    padding-top: var(--safe-area-top);
-    padding-bottom: var(--safe-area-bottom);
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
   }
 }
 
+/* ───────── components 유틸리티 ───────── */
 @layer components {
+
+  .btn-text {
+    font-size: clamp(16px, 4vw, 22px);
+    line-height: 1.4;
+    font-family: 'Pretendard', sans-serif;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* 버튼 공통 스타일 */
   .btn-primary {
     background-color: var(--color-primary-600);
     color: white;
     font-family: var(--font-sans);
     font-weight: 500;
-    font-size: 18px;
-    line-height: 22px;
+    font-size: clamp(14px, 4vw, 24px);
+    line-height: clamp(18px, 4.5vw, 26px);
     text-align: center;
     padding: 10px;
-    width: 358px;
-    height: 62px;
+    width: 100%;
+    max-width: 700px;
+    height: clamp(48px, 8vw, 125px);
     border-radius: 6px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    flex-shrink: 0;
     transition: all 0.2s ease-in-out;
   }
 
@@ -61,7 +80,7 @@
     background-color: var(--color-primary-700);
   }
 
-    /* globals.css 또는 tailwind.config.css 확장 */
+  /* 3D 카드 애니메이션 */
   .perspective {
     perspective: 1000px;
   }
@@ -75,12 +94,26 @@
     transform: rotateY(180deg);
   }
 
-/* globals.css */
-.scrollbar-hide {
-  -ms-overflow-style: none; /* IE, Edge */
-  scrollbar-width: none; /* Firefox */
+  /* 스크롤바 숨기기 */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
-.scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+
+.text-basic {
+  font-size: clamp(14px, 2.5vw,20px);
+  line-height: 1.5;
+  font-family: 'Pretendard', sans-serif;
 }
+
+/* ───────── 유틸리티: clamp 폰트 클래스 (Tailwind 확장 가능) ───────── */
+@layer utilities {
+  .text-responsive {
+    font-size: clamp(12px, 2.5vw, 18px);
+    line-height: clamp(16px, 3vw, 24px);
+  }
 }

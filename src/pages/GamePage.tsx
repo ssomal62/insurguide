@@ -10,12 +10,13 @@ import { useFirebase } from "@/hooks/useFirebase";
 import { getOrCreateUUID } from "@/utils/uuid";
 import FadeTransition from "@/components/common/FadeTransition";
 import SlideTransition from "@/components/common/SlideTransition";
-import OverlayCard from "@/components/result/OverlayCard";
+import OverlayCard from "@/components/layout/OverlayCard";
 import GameOptionCard from "@/components/game/GameOptionCard";
 import QuestionPrompt from "@/components/game/QuestionPrompt";
 import QuestionReference from "@/components/game/QuestionReference";
 import { useEffect } from "react";
 import { useMemo } from "react";
+import ShortPageLayout from "@/components/layout/ShortPageLayout";
 
 const GamePage = () => {
   const navigate = useNavigate();
@@ -35,22 +36,17 @@ const GamePage = () => {
     Date.now()
   );
   const uuid = useMemo(() => getOrCreateUUID(), []);
-
   const { recordChoice } = useGameState();
   const { logPagePerformance } = useFirebase();
-
-  useEffect(() => {
-    const loadTime = Math.round(performance.now());
-    logPagePerformance({ page: "game", loadTime });
-  }, []);
-
-  useEffect(() => {
-    setSelectionStartTime(Date.now());
-  }, [currentQuestionIndex]);
 
   const gameStartTimeRef = useRef(Date.now());
 
   useEffect(() => {
+    logPagePerformance({
+      page: "game",
+      loadTime: Math.round(performance.now()),
+    });
+    setSelectionStartTime(Date.now());
     sessionStorage.setItem(
       "gameStartTime",
       gameStartTimeRef.current.toString()
@@ -58,15 +54,16 @@ const GamePage = () => {
   }, []);
 
   useEffect(() => {
+    setSelectionStartTime(Date.now());
+  }, [currentQuestionIndex]);
+
+  useEffect(() => {
     const cleanup = setupExitDetection(
       uuid,
       currentRound,
       gameStartTimeRef.current
     );
-
-    return () => {
-      cleanup();
-    };
+    return () => cleanup();
   }, [uuid, currentRound]);
 
   const handleOptionSelect = (option: Option) => {
@@ -90,26 +87,16 @@ const GamePage = () => {
 
     if (!confirmed) {
       setConfirmed(true);
-
       const selected =
         selectedOptionId === currentQuestion.options[0].id ? "left" : "right";
-
       recordChoice({
         questionId: currentQuestion.id,
-        left: {
-          title: currentQuestion.options[0].title,
-          amount: currentQuestion.options[0].amount,
-          category: currentQuestion.options[0].category,
-        },
-        right: {
-          title: currentQuestion.options[1].title,
-          amount: currentQuestion.options[1].amount,
-          category: currentQuestion.options[1].category,
-        },
+        left: currentQuestion.options[0],
+        right: currentQuestion.options[1],
         selected,
       });
     } else {
-      if (currentQuestionIndex < totalRounds - 1) {
+      if (!isLastRound) {
         setCurrentQuestionIndex((prev) => prev + 1);
         setSelectedOptionId(null);
         setConfirmed(false);
@@ -122,42 +109,70 @@ const GamePage = () => {
   if (!currentQuestion) return <div>로딩 중...</div>;
 
   return (
-    <div className="relative w-[393px] h-[852px] bg-white overflow-hidden font-[Pretendard]">
-      {/* 슬라이딩 대상: 질문+옵션 */}
+    <ShortPageLayout
+      className="bg-white text-black font-[Pretendard]"
+      header={
+        <div className="w-full px-[clamp(16px,5vw,28px)] pt-[clamp(20px,3vh,40px)] max-w-container">
+          <ProgressBar currentRound={currentRound} totalRounds={totalRounds} />
+        </div>
+      }
+      footer={
+        <CommonButton
+          className="relative z-50"
+          variant={
+            confirmed ? (isLastRound ? "primary" : "secondary") : "primary"
+          }
+          disabled={!selectedOptionId}
+          onClick={handleConfirm}
+          label={
+            confirmed ? (isLastRound ? "결과 보기" : "다음 단계") : "선택하기"
+          }
+        />
+      }
+    >
       <SlideTransition keyId={currentQuestion.id}>
-        <div className="relative w-full h-full pt-[180px] px-[22px]">
-          <QuestionPrompt text={currentQuestion.description} />
+        <div className="w-full min-h-full max-w-container mx-auto flex flex-col px-[clamp(16px,5vw,28px)] -mt-[15vh]">
+          <div className="flex-shrink-0 pt-[clamp(20px,8vh,60px)] pb-[clamp(16px,4vh,32px)]">
+            <div className="text-center">
+              <QuestionPrompt text={currentQuestion.description} />
 
-          {currentQuestion.reference && (
-            <QuestionReference reference={currentQuestion.reference} />
-          )}
+              {currentQuestion.reference && (
+                <div className="mt-[clamp(8px,2vh,16px)]">
+                  <QuestionReference reference={currentQuestion.reference} />
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center gap-x-[clamp(6px,2vw,24px)] w-full">
+              <GameOptionCard
+                option={currentQuestion.options[0]}
+                position="left"
+                isSelected={selectedOptionId === currentQuestion.options[0].id}
+                questionId={currentQuestion.id}
+                round={currentRound}
+                onClick={() => handleOptionSelect(currentQuestion.options[0])}
+              />
 
-          <GameOptionCard
-            option={currentQuestion.options[0]}
-            position="left"
-            isSelected={selectedOptionId === currentQuestion.options[0].id}
-            questionId={currentQuestion.id}
-            round={currentRound}
-            onClick={() => handleOptionSelect(currentQuestion.options[0])}
-          />
+              <div className="text-[#A9A9A9] text-[clamp(14px,3.5vw,28px)] pb-[clamp(14px,10vw,80px)] font-semibold leading-[1.2] px-1">
+                VS
+              </div>
 
-          <GameOptionCard
-            option={currentQuestion.options[1]}
-            position="right"
-            isSelected={selectedOptionId === currentQuestion.options[1].id}
-            questionId={currentQuestion.id}
-            round={currentRound}
-            onClick={() => handleOptionSelect(currentQuestion.options[1])}
-          />
-
-          <div className="absolute top-[415px] left-1/2 -translate-x-1/2 text-[#1989FF] text-[20px] font-semibold leading-[28px] z-10">
-            VS
+              <GameOptionCard
+                option={currentQuestion.options[1]}
+                position="right"
+                isSelected={selectedOptionId === currentQuestion.options[1].id}
+                questionId={currentQuestion.id}
+                round={currentRound}
+                onClick={() => handleOptionSelect(currentQuestion.options[1])}
+              />
+            </div>
           </div>
         </div>
       </SlideTransition>
 
       {confirmed && partnerPick && (
-        <div className="absolute inset-0 z-[50]">
+        <div className="absolute inset-0 z-50">
           <FadeTransition isVisible={true}>
             <OverlayCard
               designIntent={currentQuestion.designIntent}
@@ -176,26 +191,7 @@ const GamePage = () => {
           </FadeTransition>
         </div>
       )}
-
-      {/* 고정 상단 프로그레스 바 */}
-      <div className="absolute top-[94px] left-0 right-0 px-[22px] z-20">
-        <ProgressBar currentRound={currentRound} totalRounds={totalRounds} />
-      </div>
-
-      {/* 고정 하단 버튼 */}
-      <div className="absolute top-[722px] left-0 right-0 flex justify-center z-50">
-        <CommonButton
-          variant={
-            confirmed ? (isLastRound ? "primary" : "secondary") : "primary"
-          }
-          disabled={!selectedOptionId}
-          onClick={handleConfirm}
-          label={
-            confirmed ? (isLastRound ? "결과 보기" : "다음 단계") : "선택하기"
-          }
-        />
-      </div>
-    </div>
+    </ShortPageLayout>
   );
 };
 

@@ -15,7 +15,8 @@ export const OptionCard = ({
   back,
 }: OptionCardProps) => {
   return (
-    <button onClick={onClick} className="rounded-[10px] w-fit">
+
+    <button onClick={onClick} className="rounded-[10px] w-full h-full">
       <CardFlip isFlipped={isFlipped} front={front} back={back} />
     </button>
   );
