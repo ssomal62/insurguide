@@ -1,4 +1,3 @@
-
 /** 텍스트 크기: 모바일~태블릿 대응 */
 export const responsiveText = {
   base: "text-[clamp(12px,4vw,18px)] leading-[1.5] font-normal font-[Pretendard] text-center",
@@ -8,7 +7,7 @@ export const responsiveText = {
     "text-[clamp(14px,3vw,24px)] font-bold leading-[1.45] font-[Pretendard] text-center",
   large:
     "text-[clamp(22px,5vw,40px)] font-nomal leading-[1.45] font-[Pretendard] text-center",
-  heading: "text-[clamp(30px,6vw,60px)] font-bold leading-tight text-center",
+  heading: "text-[clamp(30px,6vw,46px)] font-semibold leading-tight text-center",
   subtext:
     "text-[clamp(14px,4vw,24px)] leading-[1.5] text-[#030303] tracking-[-0.35px] font-[Archivo] text-center",
   small: "text-small leading-[1.4] font-sans",
@@ -25,8 +24,8 @@ export const responsiveText = {
 };
 
 export const responsiveImage = {
-  square: "w-[100%] max-w-[400px] aspect-square",
-  result: "w-[70%] max-w-[400px] aspect-square",
+  square: "w-[57%] max-w-[400px] aspect-square",
+  result: "w-[57%] max-w-[400px] aspect-square",
   // 카드 이미지용 - 높이 제한
   cardImage: "w-full aspect-[4/3] max-h-[240px] object-cover rounded-lg",
 };

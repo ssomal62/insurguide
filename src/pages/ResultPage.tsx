@@ -19,11 +19,11 @@ const ResultPage = () => {
   const navigate = useNavigate();
   const [userChoices, setUserChoices] = useState<GameChoice[]>([]);
   const [isCopied, setIsCopied] = useState(false);
-  const [shareUrl, setShareUrl] = useState<string>(""); // 🔥 추가
-  const [isSharing, setIsSharing] = useState(false); // 🔥 추가
+  const [shareUrl, setShareUrl] = useState<string>("");
+  const [isSharing, setIsSharing] = useState(false);
 
   const { generateBasicPrompt } = usePromptGeneration();
-  const { saveAndShareResult } = useSharedResult(); // 🔥 추가
+  const { saveAndShareResult } = useSharedResult();
   const {
     logResultViewed,
     logPromptCopied,
@@ -250,7 +250,7 @@ const ResultPage = () => {
                 </div>
               }
               onClick={handleShare}
-              disabled={isSharing || !shareUrl} // 🔥 추가: 공유 URL이 없거나 공유 중일 때 비활성화
+              disabled={isSharing || !shareUrl}
             />
           </div>
         </div>

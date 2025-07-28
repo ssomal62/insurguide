@@ -4,7 +4,7 @@ import { GameChoice } from "@/hooks/useGame";
 import { useSharedResult } from "@/hooks/useSharedResult";
 import { useFirebase } from "@/hooks/useFirebase";
 import { getOrCreateUUID } from "@/utils/uuid";
-
+import { partnerChoices } from "@/data/partnerChoices";
 import { CommonButton } from "@/components/common/Button";
 import ChoiceListCard from "@/components/result/ChoiceListCard";
 import ScrollPageLayout from "@/components/layout/ScrollPageLayout";
@@ -15,11 +15,11 @@ const SharedResultPage = () => {
   const navigate = useNavigate();
   const { loadSharedResult, isLoading, error } = useSharedResult();
   const { logSharedResultViewed } = useFirebase();
-  
+
   const [userChoices, setUserChoices] = useState<GameChoice[]>([]);
   const [viewCount, setViewCount] = useState<number>(0);
   const [loadError, setLoadError] = useState<string>("");
-  
+
   const viewerUuid = getOrCreateUUID();
 
   useEffect(() => {
@@ -30,17 +30,17 @@ const SharedResultPage = () => {
       }
 
       const result = await loadSharedResult(shareId);
-      
+
       if (result.success && result.data) {
         setUserChoices(result.data.userChoices);
-        setViewCount(result.data.viewCount + 1); // 조회수는 이미 증가된 상태
+        setViewCount(result.data.viewCount + 1);
 
         // Firebase 이벤트 로깅
         logSharedResultViewed({
           shareId,
           viewerUuid,
           originalCreatorUuid: result.data.creatorUuid,
-          choiceCount: result.data.userChoices.length
+          choiceCount: result.data.userChoices.length,
         });
       } else {
         setLoadError(result.error || "결과를 불러올 수 없습니다.");
@@ -56,7 +56,7 @@ const SharedResultPage = () => {
       logSharedResultViewed({
         shareId,
         viewerUuid,
-        action: "play_clicked"
+        action: "play_clicked",
       });
     }
     navigate("/");
@@ -111,7 +111,6 @@ const SharedResultPage = () => {
           <CommonButton
             variant="primary"
             className="w-full result-page"
-            
             label={
               <div className="flex items-center justify-center gap-2">
                 {/* <img
@@ -124,7 +123,7 @@ const SharedResultPage = () => {
             }
             onClick={handlePlayGame}
           />
-          
+
           <div className="mt-2 text-center">
             <p className="text-base text-gray-500">
               이미 {viewCount}명이 확인했어요!
@@ -137,14 +136,11 @@ const SharedResultPage = () => {
         {/* 공유 배너 */}
         <div className="w-full bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-8">
           <p className={`${responsiveText.medium} text-[#1989FF] font-medium`}>
-             ✨친구의 보험 성향 결과
+            ✨친구의 보험 성향 결과
           </p>
-          <p className="text-sm text-gray-600 mt-1">
-            조회수 {viewCount}회
-          </p>
+          <p className="text-sm text-gray-600 mt-1">조회수 {viewCount}회</p>
         </div>
 
-        {/* 기존 결과 화면과 동일한 구조 */}
         <img
           src="/images/icons/clapping.png"
           alt="trophy"
@@ -166,6 +162,12 @@ const SharedResultPage = () => {
           title="친구가 선택한 보험"
           type="user"
           choices={userChoices}
+        />
+        <div style={{ marginTop: "clamp(16px, 4vw, 40px)" }} />
+        <ChoiceListCard
+          title="상호의 Pick!"
+          type="partner"
+          choices={partnerChoices}
         />
       </div>
     </ScrollPageLayout>
