@@ -35,10 +35,10 @@ export const CommonButton = ({
   return (
     <button
       {...props}
-      style={{
-        width: className?.includes('result-page') ? '100%' : '91.1vw',
-        height: '7.28vh',
-      }}
+style={{
+  width: '100%',
+  height: 'clamp(48px, 8vh, 80px)', // 또는 원하는 fluid 값
+}}
       className={clsx(
         'flex items-center justify-center px-[10px] rounded-[6px] transition-colors duration-150 focus:outline-none disabled:opacity-50',
         variants[variant],

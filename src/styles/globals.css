@@ -117,3 +117,25 @@
     line-height: clamp(16px, 3vw, 24px);
   }
 }
+
+@media (min-width: 768px) {
+  .web-wrapper {
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: #f8f8f8;
+  }
+
+  .web-app {
+    width: 768px;
+    height: 926px;
+    background-color: white;
+    position: relative;
+    transform-origin: top center;
+    transform: scale(calc(min(100vw / 768, 100vh / 926)));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+}

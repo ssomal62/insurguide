@@ -6,19 +6,18 @@ interface Props {
 
 const ScrollPageLayout = ({ children, footer, className }: Props) => {
   return (
-    <div className={`w-full min-h-[100dvh] overflow-y-auto scrollbar-hide max-w-container min-w-screen mx-auto ${className ?? "bg-white"}`}>
-      <div className="w-full px-[4.33%] pt-safe">
+    <div className={`w-full max-w-container min-w-screen mx-auto bg-white ${className ?? ""}`}>
+      {/* 메인 컨텐츠 영역 */}
+      <main className="w-full px-[4.33%] pt-[clamp(32px,4vh,60px)] pb-[clamp(32px,4vh,60px)]">
         {children}
-      </div>
+      </main>
 
+      {/* 푸터 영역 */}
       {footer && (
-        <div className="w-full px-[4.33%] pb-[8.22vh] mt-[clamp(32px,6vh,60px)] flex justify-center">
-          <div className="w-full flex justify-center">
-            {footer}
-          </div>
-        </div>
+        <footer className="w-full px-4 pb-[clamp(16px,6vh,48px)] -mt-[clamp(32px,4vh,60px)] flex justify-center">
+          <div className="w-full max-w-[700px]">{footer}</div>
+        </footer>
       )}
-      
     </div>
   );
 };

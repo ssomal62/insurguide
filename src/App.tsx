@@ -6,14 +6,32 @@ import SharedResultPage from "./pages/SharedResultPage";
 import IntroPage from "./pages/IntroPage";
 
 function App() {
+  const isMobile = /iPhone|Android|Mobile/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    return (
+      <Routes>
+        <Route path="/" element={<StartPage />} />
+        <Route path="/intro" element={<IntroPage />} />
+        <Route path="/game" element={<GamePage />} />
+        <Route path="/result" element={<ResultPage />} />
+        <Route path="/shared/:shareId" element={<SharedResultPage />} />
+      </Routes>
+    );
+  }
+
   return (
-    <Routes>
-      <Route path="/" element={<StartPage />} />
-      <Route path="/intro" element={<IntroPage />} />
-      <Route path="/game" element={<GamePage />} />
-      <Route path="/result" element={<ResultPage />} />
-      <Route path="/shared/:shareId" element={<SharedResultPage />} />
-    </Routes>
+    <div className="web-wrapper">
+      <div className="web-app">
+        <Routes>
+          <Route path="/" element={<StartPage />} />
+          <Route path="/intro" element={<IntroPage />} />
+          <Route path="/game" element={<GamePage />} />
+          <Route path="/result" element={<ResultPage />} />
+          <Route path="/shared/:shareId" element={<SharedResultPage />} />
+        </Routes>
+      </div>
+    </div>
   );
 }
 

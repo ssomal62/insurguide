@@ -39,7 +39,7 @@ const GameOptionCard = ({ option, isSelected, onClick, questionId, round}: Props
   };
 
   return (
-    <div className="flex flex-col items-center w-full max-w-[min(40vw,300px)] min-w-[160px]">
+    <div className="flex flex-col items-center w-full max-w-[min(40vw,300px)] min-w-[140px]">
       <div className="w-full aspect-[160/218]">
         <OptionCard
           isSelected={isSelected}

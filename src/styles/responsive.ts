@@ -14,7 +14,7 @@ export const responsiveText = {
   question:
     "text-[clamp(12px,4vw,24px)] leading-[1.45] font-[Pretendard] text-center",
   description:
-    "text-[clamp(14px,3vw,22px)] font-nomal leading-[1.6] font-[Pretendard]",
+    "text-[clamp(8px,3vw,22px)] font-nomal leading-[1.6] font-[Pretendard]",
   title:
     "text-[clamp(16px,4vw,24px)] font-medium leading-[1.2] font-[Pretendard] text-center",
   vs: "text-[clamp(18px,3vw,24px)] font-semibold text-primary-600",

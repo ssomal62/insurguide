@@ -256,37 +256,41 @@ const ResultPage = () => {
         </div>
       }
     >
-      <div className="w-full flex flex-col items-center pt-[71px] text-center font-[Pretendard]">
-        {/* 1. 이미지 */}
-        <img
-          src="/images/icons/clapping.png"
-          alt="trophy"
-          className={responsiveImage.result}
-        />
+<div className="w-full flex flex-col items-center text-center font-[Pretendard]">
+  <img
+    src="/images/icons/clapping.png"
+    alt="trophy"
+    className={responsiveImage.result}
+  />
 
-        <div style={{ marginTop: "clamp(16px, 4vw, 32px)" }} />
-        <h1 className={responsiveText.large}>보험 탐구 여정이 끝났어요!</h1>
-        <div style={{ marginTop: "clamp(12px, 3vw, 24px)" }} />
-        <span className={responsiveText.subtext}>
-          이제 결과를 확인할 차례예요!
-          <br />
-          아래 프롬프트를 ChatGPT에 붙여넣으면
-          <br />
-          당신의 보험 성향을 분석해드려요.
-        </span>
-        <div style={{ marginTop: "clamp(40px, 6vw, 80px)" }} />
-        <ChoiceListCard
-          title="내가 선택한 보험"
-          type="user"
-          choices={userChoices}
-        />
-        <div style={{ marginTop: "clamp(16px, 4vw, 40px)" }} />
-        <ChoiceListCard
-          title="상호의 Pick!"
-          type="partner"
-          choices={partnerChoices}
-        />
-      </div>
+  <h1 className={`${responsiveText.large} mt-[clamp(12px,3vw,24px)]`}>
+    보험 탐구 여정이 끝났어요!
+  </h1>
+
+  <span className={`${responsiveText.subtext} mt-[clamp(8px,2.5vw,20px)]`}>
+    이제 결과를 확인할 차례예요!
+    <br />
+    아래 프롬프트를 ChatGPT에 붙여넣으면
+    <br />
+    당신의 보험 성향을 분석해드려요.
+  </span>
+
+  <div className="mt-[clamp(24px,5vw,48px)] w-full">
+    <ChoiceListCard
+      title="내가 선택한 보험"
+      type="user"
+      choices={userChoices}
+    />
+  </div>
+
+  <div className="mt-[clamp(16px,4vw,32px)] w-full">
+    <ChoiceListCard
+      title="상호의 Pick!"
+      type="partner"
+      choices={partnerChoices}
+    />
+  </div>
+</div>
     </ScrollPageLayout>
   );
 };

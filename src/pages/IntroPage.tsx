@@ -22,7 +22,7 @@ const IntroPage = () => {
   }
 >
   <SlideTransition keyId="intro">
-    <div className="flex flex-col items-center text-center w-full px-4">
+    <div className="flex flex-col items-center text-center w-full px-4 gap-[clamp(24px,4vh,64px)]">
       <p className={`${responsiveText.medium}`}>
         상호는 보험에 가입하려고 해요.
         <br />
@@ -34,21 +34,19 @@ const IntroPage = () => {
         보험을 선택하려고 해요.
       </p>
 
-      <div className="mt-[6vh]">
-        <CharacterCard
-          name="안상호"
-          imageSrc="/images/icons/avatar.png"
-          info={[
-            "성별 : 남",
-            "나이 : 30대 후반",
-            "직업 : 사무직",
-            "이혼자 유무 : X",
-            "질병 이력 : 최근 10년간 없음",
-          ]}
-        />
-      </div>
+      <CharacterCard
+        name="안상호"
+        imageSrc="/images/icons/avatar.png"
+        info={[
+          "성별 : 남",
+          "나이 : 30대 후반",
+          "직업 : 사무직",
+          "이혼자 유무 : X",
+          "질병 이력 : 최근 10년간 없음",
+        ]}
+      />
 
-      <p className={`mt-[4vh] ${responsiveText.large}`}>
+      <p className={`${responsiveText.large}`}>
         여러분도 자신의 조건을 떠올리며
         <br />
         함께 선택해보세요!
@@ -56,6 +54,7 @@ const IntroPage = () => {
     </div>
   </SlideTransition>
 </ShortPageLayout>
+
   );
 };
 
