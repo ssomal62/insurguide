@@ -4,7 +4,6 @@ import { GameChoice } from "@/hooks/useGame";
 import { useSharedResult } from "@/hooks/useSharedResult";
 import { useFirebase } from "@/hooks/useFirebase";
 import { getOrCreateUUID } from "@/utils/uuid";
-import { partnerChoices } from "@/data/partnerChoices";
 import { CommonButton } from "@/components/common/Button";
 import ChoiceListCard from "@/components/result/ChoiceListCard";
 import ScrollPageLayout from "@/components/layout/ScrollPageLayout";
@@ -113,11 +112,6 @@ const SharedResultPage = () => {
             className="w-full result-page"
             label={
               <div className="flex items-center justify-center gap-2">
-                {/* <img
-                  src="/images/icons/play.png"
-                  alt="play icon"
-                  className="w-[20px] h-[20px]"
-                /> */}
                 나도 해보기
               </div>
             }
@@ -150,13 +144,13 @@ const SharedResultPage = () => {
         </div>
 
         <img
-          src="/images/icons/clapping.png"
+          src="/images/icons/checkresult.png"
           alt="trophy"
-          className={responsiveImage.result}
+          className={responsiveImage.shared}
         />
 
         <div style={{ marginTop: "clamp(16px, 4vw, 32px)" }} />
-        {/* <h1 className={responsiveText.large}>친구의 보험 성향 결과!</h1> */}
+        <h1 className={responsiveText.large}>친구의 보험 탐구 결과예요!</h1>
         <div style={{ marginTop: "clamp(12px, 3vw, 24px)" }} />
         <span className={responsiveText.subtext}>
           친구가 어떤 보험을 선택했는지 확인해보세요!
@@ -172,11 +166,11 @@ const SharedResultPage = () => {
           choices={userChoices}
         />
         <div style={{ marginTop: "clamp(16px, 4vw, 40px)" }} />
-        <ChoiceListCard
+        {/* <ChoiceListCard
           title="상호의 Pick!"
           type="partner"
           choices={partnerChoices}
-        />
+        /> */}
       </div>
     </ScrollPageLayout>
   );

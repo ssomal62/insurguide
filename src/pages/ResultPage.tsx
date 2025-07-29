@@ -13,8 +13,15 @@ import { useSharedResult } from "@/hooks/useSharedResult";
 
 import ChoiceListCard from "@/components/result/ChoiceListCard";
 import ScrollPageLayout from "@/components/layout/ScrollPageLayout";
-import CopyToast from "@/components/common/CopyToast"; // 🔥 추가
+import CopyToast from "@/components/common/CopyToast";
 import { responsiveImage, responsiveText } from "@/styles/responsive";
+
+import { 
+  share, 
+  createGameShareData, 
+  ShareResult,
+  isNativeShareSupported 
+} from "@/utils/share";
 
 const ResultPage = () => {
   const navigate = useNavigate();
@@ -22,8 +29,8 @@ const ResultPage = () => {
   const [isCopied, setIsCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string>("");
   const [isSharing, setIsSharing] = useState(false);
-  const [showToast, setShowToast] = useState(false); // 🔥 토스트 상태 추가
-  const [toastMessage, setToastMessage] = useState(""); // 🔥 토스트 메시지 추가
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const { generateBasicPrompt } = usePromptGeneration();
   const { saveAndShareResult } = useSharedResult();
@@ -42,7 +49,7 @@ const ResultPage = () => {
     logPagePerformance({ page: "result", loadTime });
   }, []);
 
-  // [🔥 Firebase] 게임 결과 보기 이벤트 전송
+  // 게임 결과 로드
   useEffect(() => {
     const stored = sessionStorage.getItem("userChoices");
     if (stored) {
@@ -72,7 +79,7 @@ const ResultPage = () => {
   const roundResults = convertGameChoicesToRoundResults(userChoices);
   const { prompt } = generateBasicPrompt(roundResults);
 
-  // [🔥 Firestore] 공유 URL 생성
+  // 공유 URL 생성
   useEffect(() => {
     const createShareUrl = async () => {
       if (userChoices.length === 0 || shareUrl) return;
@@ -81,6 +88,7 @@ const ResultPage = () => {
         const result = await saveAndShareResult(userChoices, prompt, uuid);
         if (result.success && result.shareUrl) {
           setShareUrl(result.shareUrl);
+          console.log('🔥 공유 URL 생성 완료:', result.shareUrl);
         }
       } catch (error) {
         console.error('공유 URL 생성 실패:', error);
@@ -90,19 +98,19 @@ const ResultPage = () => {
     createShareUrl();
   }, [userChoices, prompt, uuid, shareUrl]);
 
-  // 🔥 토스트 표시 함수
+  // 토스트 표시 함수
   const showCopyToast = (message: string) => {
     setToastMessage(message);
     setShowToast(true);
   };
 
-  // 🔥 토스트 닫기 함수
+  // 토스트 닫기 함수
   const handleToastClose = () => {
     setShowToast(false);
     setToastMessage("");
   };
 
-  // [🔥 Firebase] 프롬프트 복사
+  // 프롬프트 복사
   const handleCopy = async () => {
     const result = await copyToClipboard(prompt);
     if (result.success) {
@@ -121,127 +129,98 @@ const ResultPage = () => {
     }
   };
 
-const handleShare = async () => {
-  console.log('🔥 handleShare 시작');
-  console.log('shareUrl:', shareUrl);
-  
-  if (!shareUrl) {
-    alert("공유 링크를 생성하는 중입니다. 잠시 후 다시 시도해주세요.");
-    return;
-  }
-
-  setIsSharing(true);
-  console.log('🔥 공유 시작...');
-
-  try {
-    // 🔥 1순위: 네이티브 공유 API
-    console.log('🔥 네이티브 공유 체크:', {
-      'navigator.share': !!navigator.share,
-      'window.isSecureContext': window.isSecureContext
-    });
-    
-    if (navigator.share && window.isSecureContext) {
-      console.log('🔥 네이티브 공유 시도...');
-      await navigator.share({
-        title: "마이리틀 보험팝 결과",
-        text: "이거 나랑 비슷한지 해봐!",
-        url: shareUrl,
-      });
-
-      console.log('✅ 네이티브 공유 성공');
-      logShareClicked({
-        uuid,
-        method: "native",
-        success: true,
-      });
+  // 🔥 개선된 공유 함수
+  const handleShare = async () => {
+    if (!shareUrl) {
+      alert("공유 링크를 생성하는 중입니다. 잠시 후 다시 시도해주세요.");
       return;
     }
 
-    // 🔥 2순위: 클립보드 API
-    console.log('🔥 클립보드 API 체크:', {
-      'navigator.clipboard': !!navigator.clipboard,
-      'window.isSecureContext': window.isSecureContext
-    });
-    
-    if (navigator.clipboard && window.isSecureContext) {
-      console.log('🔥 클립보드 복사 시도...');
-      await navigator.clipboard.writeText(shareUrl);
-      console.log('✅ 클립보드 복사 성공');
-      
-      logShareClicked({
-        uuid,
-        method: "clipboard",
-        success: true,
-      });
-      showCopyToast("링크가 복사되었어요!"); // 🔥 alert → 토스트로 변경
-      return;
-    }
+    setIsSharing(true);
 
-    // 🔥 3순위: document.execCommand 복사
-    console.log('🔥 execCommand 복사 시도...');
-    const tempTextArea = document.createElement('textarea');
-    tempTextArea.value = shareUrl;
-    tempTextArea.style.position = 'fixed';
-    tempTextArea.style.left = '-999999px';
-    tempTextArea.style.top = '-999999px';
-    document.body.appendChild(tempTextArea);
-    tempTextArea.focus();
-    tempTextArea.select();
-    
     try {
-      const successful = document.execCommand('copy');
-      console.log('🔥 execCommand 결과:', successful);
-      
-      if (successful) {
-        console.log('✅ execCommand 복사 성공');
-        logShareClicked({
-          uuid,
-          method: "fallback",
-          success: true,
-        });
-        showCopyToast("링크 복사완료 - 친구들에게 공유해보세요.");
-        document.body.removeChild(tempTextArea);
-        return;
+      // 🔥 공유 데이터 생성
+      const shareData = createGameShareData(shareUrl);
+      console.log('🔥 공유 데이터:', shareData);
+
+      // 🔥 개선된 공유 함수 호출
+      const result: ShareResult = await share(shareData);
+      console.log('🔥 공유 결과:', result);
+
+      // Firebase 로깅
+      logShareClicked({
+        uuid,
+        method: result.method,
+        success: result.success,
+      });
+
+      // 결과에 따른 사용자 피드백
+      if (result.success) {
+        if (result.method === 'native') {
+          // 네이티브 공유 성공 시 별도 토스트 없음 (시스템에서 처리)
+          console.log('✅ 네이티브 공유 완료');
+        } else if (result.method === 'clipboard') {
+          showCopyToast("공유 링크가 복사되었습니다!");
+        }
       } else {
-        throw new Error("execCommand 복사 실패");
+        // 실패 시 사용자에게 수동 복사 제공
+        console.log('❌ 공유 실패:', result.error);
+        
+        // 최종 fallback: alert로 링크 제공
+        const confirmed = confirm(
+          `자동 공유에 실패했습니다.\n링크를 수동으로 복사하시겠습니까?\n\n${shareUrl}`
+        );
+        
+        if (confirmed) {
+          // 수동 복사 시도
+          try {
+            if (navigator.clipboard && window.isSecureContext) {
+              await navigator.clipboard.writeText(shareUrl);
+              showCopyToast("링크가 복사되었습니다!");
+            } else {
+              // execCommand 시도
+              const textArea = document.createElement('textarea');
+              textArea.value = shareUrl;
+              textArea.style.position = 'fixed';
+              textArea.style.left = '-9999px';
+              document.body.appendChild(textArea);
+              textArea.focus();
+              textArea.select();
+              
+              const successful = document.execCommand('copy');
+              document.body.removeChild(textArea);
+              
+              if (successful) {
+                showCopyToast("링크가 복사되었습니다!");
+              } else {
+                alert("복사에 실패했습니다. 링크를 수동으로 복사해주세요.");
+              }
+            }
+          } catch (copyError) {
+            console.error('수동 복사 실패:', copyError);
+            alert("복사에 실패했습니다. 링크를 수동으로 복사해주세요.");
+          }
+        }
       }
-    } catch (copyError) {
-      console.log('❌ execCommand 실패:', copyError);
+
+    } catch (error) {
+      console.error('💥 공유 중 예외 발생:', error);
       
-      // 🔥 4순위: 수동 복사 안내
-      console.log('🔥 수동 복사 안내 시도...');
       logShareClicked({
         uuid,
         method: "fallback",
-        success: true,
+        success: false,
       });
       
-      document.body.removeChild(tempTextArea);
+      // 최종 fallback
+      alert(`공유 중 오류가 발생했습니다.\n링크를 수동으로 복사해주세요:\n${shareUrl}`);
       
-      // alert로 링크 표시 (가장 확실한 방법)
-      alert(`링크를 복사해서 공유하세요:\n${shareUrl}`);
-      return;
+    } finally {
+      setIsSharing(false);
     }
+  };
 
-  } catch (error) {
-    console.log('💥 최종 오류:', error);
-    
-    logShareClicked({
-      uuid,
-      method: "fallback",
-      success: false,
-    });
-    
-    // 🔥 최종 최종 fallback - 절대 실패하지 않는 방법
-    alert(`링크를 복사해서 공유하세요:\n${shareUrl}`);
-    
-  } finally {
-    console.log('🔥 공유 완료');
-    setIsSharing(false);
-  }
-};
-
-  // [🔥 Firebase] 다시하기 클릭
+  // 다시하기
   const handleReplay = () => {
     logReplayGame({
       uuid,

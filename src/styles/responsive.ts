@@ -26,7 +26,7 @@ export const responsiveText = {
 export const responsiveImage = {
   square: "w-[57%] max-w-[400px] aspect-square",
   result: "w-[57%] max-w-[400px] aspect-square",
-  // 카드 이미지용 - 높이 제한
+  shared: "w-[50%] max-w-[300px] aspect-square",
   cardImage: "w-full aspect-[4/3] max-h-[240px] object-cover rounded-lg",
 };
 
