@@ -133,12 +133,20 @@ const SharedResultPage = () => {
       }
     >
       <div className="w-full flex flex-col items-center pt-[71px] text-center font-[Pretendard]">
-        {/* 공유 배너 */}
-        <div className="w-full bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-8">
-          <p className={`${responsiveText.medium} text-[#1989FF] font-medium`}>
-            ✨친구의 보험 성향 결과
-          </p>
-          <p className="text-sm text-gray-600 mt-1">조회수 {viewCount}회</p>
+        <div className="w-full p-4 mb-8 flex justify-center">
+          <div className="flex items-center gap-[10px]">
+            <img
+              src="/images/icons/mail_dock.png"
+              alt="inbox icon"
+              style={{
+                width: "clamp(28px, 5vw, 60px)",
+                height: "clamp(28px, 5vw, 60px)",
+              }}
+            />
+            <p className={`${responsiveText.large} text-black font-medium`}>
+              친구의 보험 성향 결과
+            </p>
+          </div>
         </div>
 
         <img
@@ -148,7 +156,7 @@ const SharedResultPage = () => {
         />
 
         <div style={{ marginTop: "clamp(16px, 4vw, 32px)" }} />
-        <h1 className={responsiveText.large}>친구의 보험 탐구 결과!</h1>
+        <h1 className={responsiveText.large}>친구의 보험 성향 결과!</h1>
         <div style={{ marginTop: "clamp(12px, 3vw, 24px)" }} />
         <span className={responsiveText.subtext}>
           친구가 어떤 보험을 선택했는지 확인해보세요!
