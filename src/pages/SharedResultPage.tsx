@@ -132,7 +132,7 @@ const SharedResultPage = () => {
         </div>
       }
     >
-      <div className="w-full flex flex-col items-center pt-[71px] text-center font-[Pretendard]">
+      <div className="w-full flex flex-col items-center text-center font-[Pretendard]">
         <div className="w-full p-4 mb-8 flex justify-center">
           <div className="flex items-center gap-[10px]">
             <img
@@ -156,7 +156,7 @@ const SharedResultPage = () => {
         />
 
         <div style={{ marginTop: "clamp(16px, 4vw, 32px)" }} />
-        <h1 className={responsiveText.large}>친구의 보험 성향 결과!</h1>
+        {/* <h1 className={responsiveText.large}>친구의 보험 성향 결과!</h1> */}
         <div style={{ marginTop: "clamp(12px, 3vw, 24px)" }} />
         <span className={responsiveText.subtext}>
           친구가 어떤 보험을 선택했는지 확인해보세요!
