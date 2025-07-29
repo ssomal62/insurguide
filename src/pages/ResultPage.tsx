@@ -20,7 +20,6 @@ import {
   share, 
   createGameShareData, 
   ShareResult,
-  isNativeShareSupported 
 } from "@/utils/share";
 
 const ResultPage = () => {
